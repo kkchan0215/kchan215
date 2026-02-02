@@ -1,17 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>테스트</title>
+<title>비밀번호 확인</title>
 </head>
-<body>
-<h1>버튼 테스트</h1>
-<button onclick="test()">눌러봐</button>
+<body style="text-align:center; margin-top:100px; font-family:Arial;">
+
+<h2>비밀번호 입력</h2>
+<input type="password" id="pw">
+<button onclick="checkPw()">확인</button>
+
+<p id="result" style="font-weight:bold; margin-top:20px;"></p>
 
 <script>
-function test(){
-  alert("자바스크립트 실행 성공!");
+function checkPw() {
+    const password = document.getElementById("pw").value;
+
+    if (password === "56745634") {
+        document.getElementById("result").innerText = "✅ 통과!";
+        document.getElementById("result").style.color = "green";
+    } else {
+        document.getElementById("result").innerText = "❌ 비밀번호 틀림";
+        document.getElementById("result").style.color = "red";
+    }
 }
 </script>
+
 </body>
 </html>
