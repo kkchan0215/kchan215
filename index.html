@@ -4,28 +4,34 @@
 <meta charset="UTF-8">
 <title>비밀번호 확인</title>
 </head>
-<body style="text-align:center; margin-top:100px; font-family:Arial; background:#6a5acd; color:white;">
+<body style="text-align:center; margin-top:100px; font-family:Arial; background:#d8b4f8; color:#333;">
 
 <h2>비밀번호 입력</h2>
 <input type="password" id="pw" style="padding:10px; border-radius:5px; border:none;">
-<button onclick="checkPw()" style="padding:10px 20px; border:none; border-radius:5px; background:white; color:#6a5acd; font-weight:bold;">확인</button>
+<button onclick="checkPw()" style="padding:10px 20px; border:none; border-radius:5px; background:white; color:#8b5cf6; font-weight:bold;">확인</button>
 
 <p id="result" style="font-weight:bold; margin-top:20px;"></p>
 
 <script>
 function checkPw() {
     const password = document.getElementById("pw").value;
+    const result = document.getElementById("result");
 
-    if (password === "584373269537") {
+    if (password === "686689") {
         result.innerText = "✅ 통과!";
-        result.style.color = "#00ffcc";
+        result.style.color = "green";
     } else {
         result.innerText = "❌ 비밀번호 틀림";
-        result.style.color = "#ffdddd";
+        result.style.color = "red";
     }
+
+    // 3초 뒤 메시지 지우기
+    setTimeout(() => {
+        result.innerText = "";
+    }, 3000);
 }
 
-// 🔹 엔터 키로 실행
+// 엔터 키로 실행
 document.getElementById("pw").addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
         checkPw();
