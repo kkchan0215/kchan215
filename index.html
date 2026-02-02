@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <title>비밀번호 확인</title>
 </head>
-<body style="text-align:center; margin-top:100px; font-family:Arial;">
+<body style="text-align:center; margin-top:100px; font-family:Arial; background:#6a5acd; color:white;">
 
 <h2>비밀번호 입력</h2>
-<input type="password" id="pw">
-<button onclick="checkPw()">확인</button>
+<input type="password" id="pw" style="padding:10px; border-radius:5px; border:none;">
+<button onclick="checkPw()" style="padding:10px 20px; border:none; border-radius:5px; background:white; color:#6a5acd; font-weight:bold;">확인</button>
 
 <p id="result" style="font-weight:bold; margin-top:20px;"></p>
 
@@ -17,13 +17,20 @@ function checkPw() {
     const password = document.getElementById("pw").value;
 
     if (password === "56745634") {
-        document.getElementById("result").innerText = "✅ 통과!";
-        document.getElementById("result").style.color = "green";
+        result.innerText = "✅ 통과!";
+        result.style.color = "#00ffcc";
     } else {
-        document.getElementById("result").innerText = "❌ 비밀번호 틀림";
-        document.getElementById("result").style.color = "red";
+        result.innerText = "❌ 비밀번호 틀림";
+        result.style.color = "#ffdddd";
     }
 }
+
+// 🔹 엔터 키로 실행
+document.getElementById("pw").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        checkPw();
+    }
+});
 </script>
 
 </body>
