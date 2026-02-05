@@ -1,42 +1,159 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>비밀번호</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>병원 대기 시스템</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #d9c2ff, #b388ff);
+    color: #3a0066;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    background: #f3e8ff;
+    width: 420px;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+}
+input {
+    width: 80%;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+button {
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    background: #8e44ff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+}
+button:disabled {
+    background: #cbb3ff;
+    cursor: not-allowed;
+}
+.current {
+    font-size: 22px;
+    margin: 15px 0;
+    font-weight: bold;
+}
+.queue {
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+.ticket {
+    margin-top: 10px;
+    font-weight: bold;
+}
+.admin-box {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 2px dashed #b388ff;
+}
+</style>
 </head>
-<body style="text-align:center; margin-top:100px; font-family:Arial; background:#d8b4f8; color:#333;">
+<body>
 
-<h2>비밀번호 입력</h2>
-<input type="password" id="pw" style="padding:10px; border-radius:5px; border:none;">
-<button onclick="checkPw()" style="padding:10px 20px; border:none; border-radius:5px; background:white; color:#8b5cf6; font-weight:bold;">확인</button>
+<div class="container">
+    <h1>💜 병원 대기 시스템</h1>
 
-<p id="result" style="font-weight:bold; margin-top:20px;"></p>
+    <input type="text" id="nameInput" placeholder="이름 입력" />
+    <button onclick="register()">접수하기</button>
+    <div class="ticket" id="ticket"></div>
+
+    <div class="current">현재 진료 중: <span id="currentNumber">없음</span></div>
+    <div class="queue" id="queueList"></div>
+
+    <div class="admin-box">
+        <input type="password" id="adminPass" placeholder="관리자 비밀번호" />
+        <button onclick="adminLogin()">관리자 로그인</button>
+        <br>
+        <button id="nextBtn" onclick="nextPatient()" disabled>다음 환자 ▶</button>
+    </div>
+</div>
 
 <script>
-function checkPw() {
-    const password = document.getElementById("pw").value;
-    const result = document.getElementById("result");
+const ADMIN_PASSWORD = "9999";
+let isAdmin = false;
 
-    if (password === "686689") {
-        result.innerText = "✅ 통과!";
-        result.style.color = "green";
-    } else {
-        result.innerText = "❌ 비밀번호 틀림";
-        result.style.color = "red";
-    }
+let queue = JSON.parse(localStorage.getItem("hospitalQueue")) || [];
+let current = localStorage.getItem("currentPatient") || "없음";
+let lastNumber = parseInt(localStorage.getItem("lastNumber")) || 0;
 
-    // 3초 뒤 메시지 지우기
-    setTimeout(() => {
-        result.innerText = "";
-    }, 3000);
+function saveData() {
+    localStorage.setItem("hospitalQueue", JSON.stringify(queue));
+    localStorage.setItem("currentPatient", current);
+    localStorage.setItem("lastNumber", lastNumber);
 }
 
-// 엔터 키로 실행
-document.getElementById("pw").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") {
-        checkPw();
+function register() {
+    const name = document.getElementById("nameInput").value.trim();
+    if (!name) return alert("이름 입력해주세요!");
+
+    lastNumber++;
+    const patient = { number: lastNumber, name };
+    queue.push(patient);
+
+    document.getElementById("ticket").innerText =
+        `${name}님 대기번호: ${lastNumber}`;
+
+    document.getElementById("nameInput").value = "";
+    saveData();
+    render();
+}
+
+function adminLogin() {
+    const pass = document.getElementById("adminPass").value;
+    if (pass === ADMIN_PASSWORD) {
+        isAdmin = true;
+        document.getElementById("nextBtn").disabled = false;
+        alert("관리자 모드 활성화");
+    } else {
+        alert("비밀번호 틀림");
     }
-});
+}
+
+function nextPatient() {
+    if (!isAdmin) return;
+
+    if (queue.length === 0) {
+        current = "없음";
+    } else {
+        const next = queue.shift();
+        current = next.number;
+    }
+    saveData();
+    render();
+}
+
+function render() {
+    document.getElementById("currentNumber").innerText = current;
+    const list = document.getElementById("queueList");
+    list.innerHTML = "";
+    queue.forEach(p => {
+        const div = document.createElement("div");
+        div.innerText = `대기 ${p.number}번 - ${p.name}`;
+        list.appendChild(div);
+    });
+}
+
+render();
 </script>
 
 </body>
