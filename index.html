@@ -1,149 +1,42 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>병원 접수 시스템</title>
-<style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #d9c2ff, #b388ff);
-    color: #3a0066;
-}
-.heart-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    font-size: 26px;
-    cursor: pointer;
-}
-.container {
-    width: 450px;
-    margin: 100px auto;
-    background: #f3e8ff;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    text-align: center;
-}
-input {
-    width: 80%;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    margin-bottom: 10px;
-}
-button {
-    padding: 10px 15px;
-    border-radius: 10px;
-    border: none;
-    background: #8e44ff;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    margin: 5px;
-}
-button:disabled {
-    background: #cbb3ff;
-}
-.current {
-    font-size: 22px;
-    margin: 15px 0;
-    font-weight: bold;
-}
-.queue {
-    background: white;
-    border-radius: 10px;
-    padding: 10px;
-    max-height: 150px;
-    overflow-y: auto;
-}
-.login-box {
-    display: none;
-    margin-top: 10px;
-}
-</style>
+<meta charset="UTF-8">
+<title>비밀번호 확인</title>
 </head>
-<body>
+<body style="text-align:center; margin-top:100px; font-family:Arial; background:#d8b4f8; color:#333;">
 
-<div class="heart-btn" onclick="toggleLogin()">💜</div>
+<h2>비밀번호 입력</h2>
+<input type="password" id="pw" style="padding:10px; border-radius:5px; border:none;">
+<button onclick="checkPw()" style="padding:10px 20px; border:none; border-radius:5px; background:white; color:#8b5cf6; font-weight:bold;">확인</button>
 
-<div class="container">
-    <h1>병원 접수 시스템</h1>
-
-    <div class="login-box" id="loginBox">
-        <input type="password" id="adminPass" placeholder="관리자 비밀번호">
-        <button onclick="adminLogin()">로그인</button>
-    </div>
-
-    <div id="adminPanel" style="display:none;">
-        <input type="text" id="nameInput" placeholder="환자 이름 입력">
-        <button onclick="register()">접수하기</button>
-        <button onclick="nextPatient()">다음 환자 호출 ▶</button>
-    </div>
-
-    <div class="current">현재 진료 중: <span id="currentName">없음</span></div>
-    <div class="queue" id="queueList"></div>
-</div>
+<p id="result" style="font-weight:bold; margin-top:20px;"></p>
 
 <script>
-const ADMIN_PASSWORD = "9999";
-let queue = JSON.parse(localStorage.getItem("hospitalQueue")) || [];
-let current = localStorage.getItem("currentPatient") || "없음";
+function checkPw() {
+    const password = document.getElementById("pw").value;
+    const result = document.getElementById("result");
 
-function saveData() {
-    localStorage.setItem("hospitalQueue", JSON.stringify(queue));
-    localStorage.setItem("currentPatient", current);
-}
-
-function toggleLogin() {
-    const box = document.getElementById("loginBox");
-    box.style.display = box.style.display === "none" ? "block" : "none";
-}
-
-function adminLogin() {
-    const pass = document.getElementById("adminPass").value;
-    if (pass === ADMIN_PASSWORD) {
-        document.getElementById("adminPanel").style.display = "block";
-        alert("관리자 로그인 성공");
+    if (password === "56745634") {
+        result.innerText = "✅ 통과!";
+        result.style.color = "green";
     } else {
-        alert("비밀번호 틀림");
+        result.innerText = "❌ 비밀번호 틀림";
+        result.style.color = "red";
     }
+
+    // 3초 뒤 메시지 지우기
+    setTimeout(() => {
+        result.innerText = "";
+    }, 3000);
 }
 
-function register() {
-    const name = document.getElementById("nameInput").value.trim();
-    if (!name) return alert("이름 입력");
-
-    queue.push(name);
-    document.getElementById("nameInput").value = "";
-    saveData();
-    render();
-}
-
-function nextPatient() {
-    if (queue.length === 0) {
-        current = "없음";
-    } else {
-        current = queue.shift();
+// 엔터 키로 실행
+document.getElementById("pw").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        checkPw();
     }
-    saveData();
-    render();
-}
-
-function render() {
-    document.getElementById("currentName").innerText = current;
-    const list = document.getElementById("queueList");
-    list.innerHTML = "";
-    queue.forEach(name => {
-        const div = document.createElement("div");
-        div.innerText = name;
-        list.appendChild(div);
-    });
-}
-
-render();
+});
 </script>
 
 </body>
