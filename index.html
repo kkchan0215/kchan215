@@ -2,110 +2,128 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>미로 찾기 게임</title>
+<title>라인 미로 게임</title>
 <style>
 body {
+    margin: 0;
     background: #e9d5ff;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    height: 100vh;
+    flex-direction: column;
     font-family: Arial;
 }
-h1 { margin-top: 20px; }
-
-#maze {
-    display: grid;
-    grid-template-columns: repeat(15, 30px);
-    gap: 2px;
-    margin-top: 20px;
+canvas {
+    background: white;
+    border: 4px solid #7c3aed;
 }
-
-.cell {
-    width: 30px;
-    height: 30px;
-}
-
-.wall { background: #4c1d95; }
-.path { background: white; }
-.player { background: #22d3ee; }
-.goal { background: #22c55e; }
-
 #msg {
-    margin-top: 20px;
+    margin-top: 15px;
     font-weight: bold;
 }
 </style>
 </head>
 <body>
 
-<h1>🧩 미로 찾기</h1>
-<div id="maze"></div>
+<h2>🧩 라인 미로</h2>
+<canvas id="game" width="600" height="600"></canvas>
 <div id="msg"></div>
 
 <script>
-const mazeData = [
-"111111111111111",
-"100000000000001",
-"101111011111101",
-"101000010000101",
-"101011110111101",
-"101010000100001",
-"101010111101101",
-"100010100001001",
-"111110101111101",
-"100000100000001",
-"101111101111101",
-"100000001000001",
-"101111111011101",
-"100000000010001",
-"111111111111111"
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const walls = [
+[50,50,550,50],[50,50,50,550],[550,50,550,550],[50,550,550,550],
+[100,50,100,450],[150,150,450,150],[450,150,450,500],
+[200,250,500,250],[200,250,200,550],[100,450,350,450],
+[350,350,550,350],[300,50,300,200],[150,300,400,300],
+[400,300,400,550],[250,400,500,400]
 ];
 
-const maze = document.getElementById("maze");
-let playerPos = { x: 1, y: 1 };
-const goalPos = { x: 13, y: 13 };
+let player = {x: 70, y: 70, r: 10};
+const goal = {x: 520, y: 520, r: 15};
+const speed = 5;
 
-function drawMaze() {
-    maze.innerHTML = "";
-    mazeData.forEach((row, y) => {
-        row.split("").forEach((cell, x) => {
-            const div = document.createElement("div");
-            div.classList.add("cell");
-            if (cell === "1") div.classList.add("wall");
-            else div.classList.add("path");
-
-            if (x === playerPos.x && y === playerPos.y) div.classList.add("player");
-            if (x === goalPos.x && y === goalPos.y) div.classList.add("goal");
-
-            maze.appendChild(div);
-        });
+function drawWalls() {
+    ctx.strokeStyle = "#4c1d95";
+    ctx.lineWidth = 4;
+    walls.forEach(w => {
+        ctx.beginPath();
+        ctx.moveTo(w[0], w[1]);
+        ctx.lineTo(w[2], w[3]);
+        ctx.stroke();
     });
 }
 
-function move(dx, dy) {
-    const newX = playerPos.x + dx;
-    const newY = playerPos.y + dy;
-
-    if (mazeData[newY][newX] === "0") {
-        playerPos.x = newX;
-        playerPos.y = newY;
-    }
-
-    if (newX === goalPos.x && newY === goalPos.y) {
-        document.getElementById("msg").innerText = "🎉 도착 성공!";
-    }
-
-    drawMaze();
+function drawPlayer() {
+    ctx.fillStyle = "#0ea5e9";
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);
+    ctx.fill();
 }
 
-document.addEventListener("keydown", e => {
-    if (e.key === "ArrowUp") move(0, -1);
-    if (e.key === "ArrowDown") move(0, 1);
-    if (e.key === "ArrowLeft") move(-1, 0);
-    if (e.key === "ArrowRight") move(1, 0);
+function drawGoal() {
+    ctx.fillStyle = "#22c55e";
+    ctx.beginPath();
+    ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI*2);
+    ctx.fill();
+}
+
+function hitWall(x,y) {
+    for (let w of walls) {
+        const dist = pointLineDistance(x,y,w[0],w[1],w[2],w[3]);
+        if (dist < player.r + 2) return true;
+    }
+    return false;
+}
+
+function pointLineDistance(px,py,x1,y1,x2,y2){
+    const A = px - x1, B = py - y1;
+    const C = x2 - x1, D = y2 - y1;
+    const dot = A*C + B*D;
+    const len_sq = C*C + D*D;
+    let param = dot / len_sq;
+    if (param < 0) param = 0;
+    else if (param > 1) param = 1;
+    const xx = x1 + param * C;
+    const yy = y1 + param * D;
+    return Math.hypot(px-xx, py-yy);
+}
+
+function update(dx,dy){
+    const nx = player.x + dx;
+    const ny = player.y + dy;
+
+    if (!hitWall(nx,ny)) {
+        player.x = nx;
+        player.y = ny;
+    }
+
+    const dGoal = Math.hypot(player.x-goal.x, player.y-goal.y);
+    if (dGoal < player.r + goal.r) {
+        document.getElementById("msg").innerText = "🎉 클리어!";
+    }
+
+    draw();
+}
+
+function draw(){
+    ctx.clearRect(0,0,600,600);
+    drawWalls();
+    drawGoal();
+    drawPlayer();
+}
+
+document.addEventListener("keydown", e=>{
+    if(e.key==="ArrowUp") update(0,-speed);
+    if(e.key==="ArrowDown") update(0,speed);
+    if(e.key==="ArrowLeft") update(-speed,0);
+    if(e.key==="ArrowRight") update(speed,0);
 });
 
-drawMaze();
+draw();
 </script>
 
 </body>
