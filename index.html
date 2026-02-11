@@ -1,129 +1,66 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>라인 미로 게임</title>
-<style>
-body {
-    margin: 0;
-    background: #e9d5ff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    flex-direction: column;
-    font-family: Arial;
-}
-canvas {
-    background: white;
-    border: 4px solid #7c3aed;
-}
-#msg {
-    margin-top: 15px;
-    font-weight: bold;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>바코드 통과 시스템</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      background: #f4f6ff;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #6c7cff;
+      color: white;
+      cursor: pointer;
+    }
+    #result {
+      font-size: 40px;
+      margin-top: 30px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
-<h2>🧩 라인 미로</h2>
-<canvas id="game" width="600" height="600"></canvas>
-<div id="msg"></div>
+<h2>바코드 스캔 시스템</h2>
+<button onclick="startScanner()">📷 카메라 켜기</button>
+
+<div id="reader" style="width:300px; margin:20px auto;"></div>
+<div id="result"></div>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const passCodes = ["0000000001", "0000000002", "0000000003", "0000000004", "0000000005"];
 
-const walls = [
-[50,50,550,50],[50,50,50,550],[550,50,550,550],[50,550,550,550],
-[100,50,100,450],[150,150,450,150],[450,150,450,500],
-[200,250,500,250],[200,250,200,550],[100,450,350,450],
-[350,350,550,350],[300,50,300,200],[150,300,400,300],
-[400,300,400,550],[250,400,500,400]
-];
+let scanner;
 
-let player = {x: 70, y: 70, r: 10};
-const goal = {x: 520, y: 520, r: 15};
-const speed = 5;
-
-function drawWalls() {
-    ctx.strokeStyle = "#4c1d95";
-    ctx.lineWidth = 4;
-    walls.forEach(w => {
-        ctx.beginPath();
-        ctx.moveTo(w[0], w[1]);
-        ctx.lineTo(w[2], w[3]);
-        ctx.stroke();
-    });
-}
-
-function drawPlayer() {
-    ctx.fillStyle = "#0ea5e9";
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);
-    ctx.fill();
-}
-
-function drawGoal() {
-    ctx.fillStyle = "#22c55e";
-    ctx.beginPath();
-    ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI*2);
-    ctx.fill();
-}
-
-function hitWall(x,y) {
-    for (let w of walls) {
-        const dist = pointLineDistance(x,y,w[0],w[1],w[2],w[3]);
-        if (dist < player.r + 2) return true;
+function startScanner() {
+  scanner = new Html5Qrcode("reader");
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices && devices.length) {
+      scanner.start(
+        devices[0].id,
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      );
     }
-    return false;
+  });
 }
 
-function pointLineDistance(px,py,x1,y1,x2,y2){
-    const A = px - x1, B = py - y1;
-    const C = x2 - x1, D = y2 - y1;
-    const dot = A*C + B*D;
-    const len_sq = C*C + D*D;
-    let param = dot / len_sq;
-    if (param < 0) param = 0;
-    else if (param > 1) param = 1;
-    const xx = x1 + param * C;
-    const yy = y1 + param * D;
-    return Math.hypot(px-xx, py-yy);
+function onScanSuccess(decodedText) {
+  if (passCodes.includes(decodedText)) {
+    document.getElementById("result").innerText = "통과";
+    document.getElementById("result").style.color = "green";
+  } else {
+    document.getElementById("result").innerText = "실패";
+    document.getElementById("result").style.color = "red";
+  }
 }
-
-function update(dx,dy){
-    const nx = player.x + dx;
-    const ny = player.y + dy;
-
-    if (!hitWall(nx,ny)) {
-        player.x = nx;
-        player.y = ny;
-    }
-
-    const dGoal = Math.hypot(player.x-goal.x, player.y-goal.y);
-    if (dGoal < player.r + goal.r) {
-        document.getElementById("msg").innerText = "🎉 클리어!";
-    }
-
-    draw();
-}
-
-function draw(){
-    ctx.clearRect(0,0,600,600);
-    drawWalls();
-    drawGoal();
-    drawPlayer();
-}
-
-document.addEventListener("keydown", e=>{
-    if(e.key==="ArrowUp") update(0,-speed);
-    if(e.key==="ArrowDown") update(0,speed);
-    if(e.key==="ArrowLeft") update(-speed,0);
-    if(e.key==="ArrowRight") update(speed,0);
-});
-
-draw();
 </script>
 
 </body>
