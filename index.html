@@ -35,30 +35,45 @@
 <div id="result"></div>
 
 <script>
-const passCodes = ["0000000001", "0000000002", "0000000003", "0000000004", "0000000005"];
-
+const passCodes = ["PASS001", "PASS002", "VIP777"];
 let scanner;
 
 function startScanner() {
   scanner = new Html5Qrcode("reader");
-  Html5Qrcode.getCameras().then(devices => {
-    if (devices && devices.length) {
-      scanner.start(
-        devices[0].id,
-        { fps: 10, qrbox: 250 },
-        onScanSuccess
-      );
-    }
-  });
+
+  // 후면 카메라 사용
+  const config = { 
+    fps: 10, 
+    qrbox: 250,
+    facingMode: "environment" 
+  };
+
+  scanner.start(
+    { facingMode: "environment" },
+    config,
+    onScanSuccess
+  );
 }
 
 function onScanSuccess(decodedText) {
+  const resultDiv = document.getElementById("result");
+
   if (passCodes.includes(decodedText)) {
-    document.getElementById("result").innerText = "통과";
-    document.getElementById("result").style.color = "green";
+    resultDiv.innerText = "통과";
+    resultDiv.style.color = "green";
+
+    // 3초 후 메시지 삭제
+    setTimeout(() => {
+      resultDiv.innerText = "";
+    }, 3000);
+
   } else {
-    document.getElementById("result").innerText = "실패";
-    document.getElementById("result").style.color = "red";
+    resultDiv.innerText = "실패";
+    resultDiv.style.color = "red";
+
+    setTimeout(() => {
+      resultDiv.innerText = "";
+    }, 3000);
   }
 }
 </script>
