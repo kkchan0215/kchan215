@@ -3,91 +3,145 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>메모장</title>
-
-<link href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/yg-jalnan.woff" rel="preload" as="font" crossorigin>
+<title>나라 점수판</title>
 
 <style>
-@font-face {
-    font-family: 'Jalnan';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/yg-jalnan.woff') format('woff');
-}
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
 body{
-    background:#e8d8ff;
+    font-family: Arial, sans-serif;
+    background:#f5f5f5;
     display:flex;
     justify-content:center;
     align-items:center;
     min-height:100vh;
-    font-family:'Jalnan', sans-serif;
 }
 
-.memo{
-    width:90%;
-    max-width:700px;
+.board{
     background:white;
-    border-radius:25px;
-    padding:25px;
-    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,0.1);
 }
 
 h1{
     text-align:center;
-    color:#8a63d2;
-    margin-bottom:20px;
-    font-size:2rem;
 }
 
-textarea{
-    width:100%;
-    height:400px;
-    border:none;
-    outline:none;
-    resize:none;
-    font-family:'Jalnan', sans-serif;
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,200px);
+    gap:10px;
+}
+
+.country{
+    border:3px solid #333;
+    border-radius:12px;
+    padding:15px;
+    text-align:center;
+    background:white;
+}
+
+.name{
     font-size:20px;
-    line-height:1.7;
-    color:#555;
+    font-weight:bold;
+}
+
+.score{
+    font-size:32px;
+    margin-top:10px;
 }
 
 .info{
-    margin-top:10px;
-    text-align:right;
-    color:#999;
-    font-size:14px;
+    text-align:center;
+    margin-top:15px;
 }
 </style>
 </head>
 <body>
 
-<div class="memo">
-    <h1>💜 메모장 💜</h1>
-    <textarea id="memo" placeholder="메모를 입력하세요..."></textarea>
+<div class="board">
+    <h1>🌏 Country Score</h1>
+
+    <div class="grid">
+        <div class="country">
+            <div class="name">🇰🇷 Korea</div>
+            <div class="score" id="korea">0</div>
+        </div>
+
+        <div class="country">
+            <div class="name">🇨🇳 China</div>
+            <div class="score" id="china">0</div>
+        </div>
+
+        <div class="country">
+            <div class="name">🇯🇵 Japan</div>
+            <div class="score" id="japan">0</div>
+        </div>
+
+        <div class="country">
+            <div class="name">🇻🇳 Vietnam</div>
+            <div class="score" id="vietnam">0</div>
+        </div>
+
+        <div class="country">
+            <div class="name">🇹🇭 Thailand</div>
+            <div class="score" id="thailand">0</div>
+        </div>
+
+        <div class="country">
+            <div class="name">🇺🇸 USA</div>
+            <div class="score" id="usa">0</div>
+        </div>
+    </div>
+
     <div class="info">
-        글자 수 : <span id="count">0</span>
+        1=한국 | 2=중국 | 3=일본 | 4=베트남 | 5=태국 | 6=미국<br>
+        누를 때마다 +5점
     </div>
 </div>
 
 <script>
-const memo = document.getElementById("memo");
-const count = document.getElementById("count");
+const scores = {
+    korea:0,
+    china:0,
+    japan:0,
+    vietnam:0,
+    thailand:0,
+    usa:0
+};
 
-memo.value = localStorage.getItem("memo") || "";
+document.addEventListener("keydown", (e)=>{
 
-function saveMemo(){
-    localStorage.setItem("memo", memo.value);
-    count.textContent = memo.value.length;
-}
+    if(e.key==="1"){
+        scores.korea += 5;
+        document.getElementById("korea").textContent = scores.korea;
+    }
 
-memo.addEventListener("input", saveMemo);
+    if(e.key==="2"){
+        scores.china += 5;
+        document.getElementById("china").textContent = scores.china;
+    }
 
-count.textContent = memo.value.length;
+    if(e.key==="3"){
+        scores.japan += 5;
+        document.getElementById("japan").textContent = scores.japan;
+    }
+
+    if(e.key==="4"){
+        scores.vietnam += 5;
+        document.getElementById("vietnam").textContent = scores.vietnam;
+    }
+
+    if(e.key==="5"){
+        scores.thailand += 5;
+        document.getElementById("thailand").textContent = scores.thailand;
+    }
+
+    if(e.key==="6"){
+        scores.usa += 5;
+        document.getElementById("usa").textContent = scores.usa;
+    }
+
+});
 </script>
 
 </body>
