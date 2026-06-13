@@ -3,182 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>가상 은행</title>
+<title>가정 헌법</title>
 
 <style>
 body{
-    font-family:sans-serif;
-    background:#f5f7fb;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
+    margin:0;
+    background:#f5ecd8; /* 베이지색 */
+    color:black;
+    text-align:center;
+    font-family:"궁서", "Gungsuh", serif;
 }
 
-.box{
-    background:white;
-    padding:25px;
-    border-radius:15px;
-    width:350px;
-    box-shadow:0 0 15px rgba(0,0,0,0.1);
+.container{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 }
 
 h1{
-    text-align:center;
-}
-
-input{
-    width:100%;
-    padding:10px;
-    margin-top:8px;
-    margin-bottom:10px;
-    box-sizing:border-box;
-}
-
-button{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-.login{
-    background:#4caf50;
-    color:white;
-}
-
-.charge{
-    background:#2196f3;
-    color:white;
-}
-
-.send{
-    background:#f44336;
-    color:white;
-}
-
-.hidden{
-    display:none;
-}
-
-.balance{
-    font-size:24px;
-    text-align:center;
-    margin:15px 0;
+    margin:0;
+    font-size:64px;
     font-weight:bold;
+}
+
+.subtitle{
+    margin-top:15px;
+    font-size:18px;
 }
 </style>
 </head>
 <body>
 
-<div class="box">
-
-<div id="loginPage">
-    <h1>가상 은행</h1>
-    <p>16자리 계좌번호 입력</p>
-    <input id="accountInput" maxlength="16" placeholder="1234567890123456">
-    <button class="login" onclick="login()">로그인</button>
+<div class="container">
+    <h1>가정 헌법</h1>
+    <div class="subtitle">가정헌법</div>
 </div>
-
-<div id="bankPage" class="hidden">
-    <h1>가상 은행</h1>
-
-    <div>
-        계좌번호
-        <div id="accountText"></div>
-    </div>
-
-    <div class="balance" id="balance">
-        1,000,000원
-    </div>
-
-    <button class="charge" onclick="chargeMoney()">충전하기</button>
-    <button class="send" onclick="sendMoney()">송금하기</button>
-</div>
-
-</div>
-
-<script>
-let currentAccount = "";
-let balance = 0;
-
-function formatMoney(num){
-    return num.toLocaleString() + "원";
-}
-
-function updateBalance(){
-    document.getElementById("balance").innerText =
-        formatMoney(balance);
-}
-
-function login(){
-    const account =
-        document.getElementById("accountInput").value;
-
-    if(account.length !== 16){
-        alert("16자리 계좌번호를 입력하세요.");
-        return;
-    }
-
-    currentAccount = account;
-
-    document.getElementById("loginPage").classList.add("hidden");
-    document.getElementById("bankPage").classList.remove("hidden");
-
-    document.getElementById("accountText").innerText =
-        currentAccount;
-
-    updateBalance();
-}
-
-function chargeMoney(){
-
-    const password = prompt("충전 비밀번호 입력");
-
-    if(password !== "456345234"){
-        alert("비밀번호가 틀렸습니다.");
-        return;
-    }
-
-    const amount =
-        Number(prompt("충전할 금액 입력"));
-
-    if(isNaN(amount) || amount <= 0){
-        alert("올바른 금액을 입력하세요.");
-        return;
-    }
-
-    balance += amount;
-
-    updateBalance();
-
-    alert(amount.toLocaleString() + "원 충전 완료!");
-}
-
-function sendMoney(){
-
-    const amount =
-        Number(prompt("송금할 금액 입력"));
-
-    if(isNaN(amount) || amount <= 0){
-        alert("올바른 금액을 입력하세요.");
-        return;
-    }
-
-    if(amount > balance){
-        alert("잔액 부족!");
-        return;
-    }
-
-    balance -= amount;
-
-    updateBalance();
-
-    alert(amount.toLocaleString() + "원 송금 완료!");
-}
-</script>
 
 </body>
 </html>
