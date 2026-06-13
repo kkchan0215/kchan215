@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>나라 점수판</title>
+<title>가상 은행</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#f5f5f5;
+    font-family:sans-serif;
+    background:#f5f7fb;
     display:flex;
     justify-content:center;
     align-items:center;
     min-height:100vh;
 }
 
-.board{
+.box{
     background:white;
-    padding:20px;
+    padding:25px;
     border-radius:15px;
+    width:350px;
     box-shadow:0 0 15px rgba(0,0,0,0.1);
 }
 
@@ -26,122 +27,157 @@ h1{
     text-align:center;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,200px);
-    gap:10px;
+input{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    margin-bottom:10px;
+    box-sizing:border-box;
 }
 
-.country{
-    border:3px solid #333;
-    border-radius:12px;
-    padding:15px;
+button{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.login{
+    background:#4caf50;
+    color:white;
+}
+
+.charge{
+    background:#2196f3;
+    color:white;
+}
+
+.send{
+    background:#f44336;
+    color:white;
+}
+
+.hidden{
+    display:none;
+}
+
+.balance{
+    font-size:24px;
     text-align:center;
-    background:white;
-}
-
-.name{
-    font-size:20px;
+    margin:15px 0;
     font-weight:bold;
-}
-
-.score{
-    font-size:32px;
-    margin-top:10px;
-}
-
-.info{
-    text-align:center;
-    margin-top:15px;
 }
 </style>
 </head>
 <body>
 
-<div class="board">
-    <h1>🌏 Country Score</h1>
+<div class="box">
 
-    <div class="grid">
-        <div class="country">
-            <div class="name">🇰🇷 Korea</div>
-            <div class="score" id="korea">0</div>
-        </div>
+<div id="loginPage">
+    <h1>가상 은행</h1>
+    <p>16자리 계좌번호 입력</p>
+    <input id="accountInput" maxlength="16" placeholder="1234567890123456">
+    <button class="login" onclick="login()">로그인</button>
+</div>
 
-        <div class="country">
-            <div class="name">🇨🇳 China</div>
-            <div class="score" id="china">0</div>
-        </div>
+<div id="bankPage" class="hidden">
+    <h1>가상 은행</h1>
 
-        <div class="country">
-            <div class="name">🇯🇵 Japan</div>
-            <div class="score" id="japan">0</div>
-        </div>
-
-        <div class="country">
-            <div class="name">🇻🇳 Vietnam</div>
-            <div class="score" id="vietnam">0</div>
-        </div>
-
-        <div class="country">
-            <div class="name">🇹🇭 Thailand</div>
-            <div class="score" id="thailand">0</div>
-        </div>
-
-        <div class="country">
-            <div class="name">🇺🇸 USA</div>
-            <div class="score" id="usa">0</div>
-        </div>
+    <div>
+        계좌번호
+        <div id="accountText"></div>
     </div>
 
-    <div class="info">
-        1=한국 | 2=중국 | 3=일본 | 4=베트남 | 5=태국 | 6=미국<br>
-        누를 때마다 +5점
+    <div class="balance" id="balance">
+        1,000,000원
     </div>
+
+    <button class="charge" onclick="chargeMoney()">충전하기</button>
+    <button class="send" onclick="sendMoney()">송금하기</button>
+</div>
+
 </div>
 
 <script>
-const scores = {
-    korea:0,
-    china:0,
-    japan:0,
-    vietnam:0,
-    thailand:0,
-    usa:0
-};
+let currentAccount = "";
+let balance = 1000000;
 
-document.addEventListener("keydown", (e)=>{
+function formatMoney(num){
+    return num.toLocaleString() + "원";
+}
 
-    if(e.key==="1"){
-        scores.korea += 5;
-        document.getElementById("korea").textContent = scores.korea;
+function updateBalance(){
+    document.getElementById("balance").innerText =
+        formatMoney(balance);
+}
+
+function login(){
+    const account =
+        document.getElementById("accountInput").value;
+
+    if(account.length !== 16){
+        alert("16자리 계좌번호를 입력하세요.");
+        return;
     }
 
-    if(e.key==="2"){
-        scores.china += 5;
-        document.getElementById("china").textContent = scores.china;
+    currentAccount = account;
+
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("bankPage").classList.remove("hidden");
+
+    document.getElementById("accountText").innerText =
+        currentAccount;
+
+    updateBalance();
+}
+
+function chargeMoney(){
+
+    const password = prompt("충전 비밀번호 입력");
+
+    if(password !== "456345234"){
+        alert("비밀번호가 틀렸습니다.");
+        return;
     }
 
-    if(e.key==="3"){
-        scores.japan += 5;
-        document.getElementById("japan").textContent = scores.japan;
+    const amount =
+        Number(prompt("충전할 금액 입력"));
+
+    if(isNaN(amount) || amount <= 0){
+        alert("올바른 금액을 입력하세요.");
+        return;
     }
 
-    if(e.key==="4"){
-        scores.vietnam += 5;
-        document.getElementById("vietnam").textContent = scores.vietnam;
+    balance += amount;
+
+    updateBalance();
+
+    alert(amount.toLocaleString() + "원 충전 완료!");
+}
+
+function sendMoney(){
+
+    const amount =
+        Number(prompt("송금할 금액 입력"));
+
+    if(isNaN(amount) || amount <= 0){
+        alert("올바른 금액을 입력하세요.");
+        return;
     }
 
-    if(e.key==="5"){
-        scores.thailand += 5;
-        document.getElementById("thailand").textContent = scores.thailand;
+    if(amount > balance){
+        alert("잔액 부족!");
+        return;
     }
 
-    if(e.key==="6"){
-        scores.usa += 5;
-        document.getElementById("usa").textContent = scores.usa;
-    }
+    balance -= amount;
 
-});
+    updateBalance();
+
+    alert(amount.toLocaleString() + "원 송금 완료!");
+}
 </script>
 
 </body>
