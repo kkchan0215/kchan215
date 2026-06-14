@@ -3,45 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>가정 헌법</title>
+<title>🎁 귀여운 뽑기판 🎁</title>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
 body{
     margin:0;
-    background:#f5ecd8; /* 베이지색 */
-    color:black;
-    text-align:center;
-    font-family:"궁서", "Gungsuh", serif;
-}
-
-.container{
-    min-height:100vh;
+    height:100vh;
     display:flex;
-    flex-direction:column;
     justify-content:center;
     align-items:center;
+    background:linear-gradient(135deg,#ffeef8,#fff8dc);
+    font-family:'Jua',sans-serif;
+}
+
+.box{
+    background:white;
+    padding:30px;
+    border-radius:30px;
+    text-align:center;
+    box-shadow:0 0 25px rgba(0,0,0,0.15);
+    width:420px;
 }
 
 h1{
-    margin:0;
-    font-size:64px;
-    font-weight:bold;
+    margin-top:0;
+    font-size:38px;
 }
 
-.subtitle{
-    margin-top:15px;
-    font-size:18px;
+#result{
+    font-size:50px;
+    margin:25px 0;
+    min-height:80px;
+}
+
+button{
+    border:none;
+    padding:18px 35px;
+    border-radius:20px;
+    font-size:25px;
+    cursor:pointer;
+    background:#ffb6d9;
+    font-family:'Jua',sans-serif;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.loading{
+    animation:shake .12s infinite;
+}
+
+@keyframes shake{
+    0%{transform:translateX(-3px);}
+    50%{transform:translateX(3px);}
+    100%{transform:translateX(-3px);}
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>가정 헌법</h1>
-    <div class="subtitle">가정에서 폭력은 절대 금지한다.
-    가정에서 비속어 사용을 금지한다
-    -위 항목을 어길시 1000원 이하의 벌금-</div>
+<div class="box">
+    <h1>🎀🎁 럭키 뽑기 🎁🎀</h1>
+
+    <div id="result">
+        🎉 뽑기 시작 🎉
+    </div>
+
+    <button onclick="drawPrize()">
+        🍀 뽑기하기 🍀
+    </button>
 </div>
+
+<script>
+
+let pool = [];
+
+// 1등 2개
+for(let i=0;i<2;i++) pool.push("🥇 1등");
+
+// 2등 5개
+for(let i=0;i<5;i++) pool.push("🥈 2등");
+
+// 3등 10개
+for(let i=0;i<10;i++) pool.push("🥉 3등");
+
+// 4등 20개
+for(let i=0;i<20;i++) pool.push("🏅 4등");
+
+// 5등 30개
+for(let i=0;i<30;i++) pool.push("🎖️ 5등");
+
+// 나머지 233개
+for(let i=0;i<50;i++) pool.push("6등");
+for(let i=0;i<60;i++) pool.push("7등");
+for(let i=0;i<50;i++) pool.push("8등");
+for(let i=0;i<40;i++) pool.push("9등");
+for(let i=0;i<33;i++) pool.push("🔟 10등");
+
+// 새로고침 때마다 섞기
+pool.sort(()=>Math.random()-0.5);
+
+function drawPrize(){
+
+    const result=document.getElementById("result");
+
+    result.classList.add("loading");
+
+    let count=0;
+
+    const drum=setInterval(()=>{
+        count++;
+
+        result.innerHTML=
+        "🎁 "+(Math.floor(Math.random()*10)+1)+"등 🎁";
+
+        if(count>=25){
+
+            clearInterval(drum);
+
+            const prize=
+            pool[Math.floor(Math.random()*pool.length)];
+
+            result.classList.remove("loading");
+
+            result.innerHTML=
+            "✨✨<br>"+prize+" 당첨!<br>✨✨";
+        }
+
+    },100);
+}
+</script>
 
 </body>
 </html>
