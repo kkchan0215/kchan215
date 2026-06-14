@@ -3,10 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎁 뽑기판 🎁</title>
+<title>🎀 뽑기판 🎀</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+*{
+    box-sizing:border-box;
+}
 
 body{
     margin:0;
@@ -16,101 +20,134 @@ body{
 }
 
 h1{
-    margin:20px;
+    margin:20px 0;
+    font-size:38px;
+}
+
+p{
+    margin-top:-10px;
+    font-size:18px;
 }
 
 #board{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(45px,1fr));
-    gap:6px;
-    padding:15px;
+    grid-template-columns:repeat(15,1fr);
+    gap:8px;
 }
 
 .ticket{
+    height:45px;
     background:white;
     border:2px dashed #ff9acb;
-    border-radius:10px;
-    aspect-ratio:1;
+    border-radius:8px;
     display:flex;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
     cursor:pointer;
-    font-size:18px;
+    user-select:none;
     transition:.2s;
+    font-size:15px;
 }
 
 .ticket:hover{
-    transform:scale(1.1);
+    transform:scale(1.05);
 }
 
 .used{
-    opacity:.3;
+    opacity:.35;
     pointer-events:none;
+}
+
+.shaking{
+    animation:shake .08s infinite;
+}
+
+@keyframes shake{
+    0%{transform:rotate(-3deg);}
+    50%{transform:rotate(3deg);}
+    100%{transform:rotate(-3deg);}
 }
 
 #result{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.7);
+    background:rgba(0,0,0,0.7);
     display:none;
     justify-content:center;
     align-items:center;
-    flex-direction:column;
-    color:white;
-    font-size:50px;
+    z-index:999;
 }
 
-.drum{
-    animation:shake .08s infinite;
+.result-box{
+    background:white;
+    padding:40px;
+    border-radius:25px;
+    min-width:300px;
+    box-shadow:0 0 30px rgba(0,0,0,0.2);
 }
 
-@keyframes shake{
-    0%{transform:translateX(-4px);}
-    50%{transform:translateX(4px);}
-    100%{transform:translateX(-4px);}
+#text{
+    font-size:55px;
 }
 </style>
 </head>
 <body>
 
-<h1>🎀 럭키 뽑기 🎀</h1>
+<h1>🎀🎁 럭키 뽑기판 🎁🎀</h1>
+<p>원하는 종이를 눌러보세요 ✨</p>
 
 <div id="board"></div>
 
 <div id="result">
-    <div id="text"></div>
+    <div class="result-box">
+        <div id="text"></div>
+    </div>
 </div>
 
 <script>
 
+// 총 300장
 const prizes=[];
 
-// 총 300장
+// 1등 2개
+for(let i=0;i<2;i++) prizes.push("🥇 1등");
 
-for(let i=0;i<2;i++) prizes.push("🥇1등");
-for(let i=0;i<5;i++) prizes.push("🥈2등");
-for(let i=0;i<10;i++) prizes.push("🥉3등");
-for(let i=0;i<20;i++) prizes.push("🏅4등");
-for(let i=0;i<30;i++) prizes.push("🎖️5등");
-for(let i=0;i<40;i++) prizes.push("6등");
-for(let i=0;i<50;i++) prizes.push("7등");
-for(let i=0;i<55;i++) prizes.push("8등");
-for(let i=0;i<45;i++) prizes.push("9등");
-for(let i=0;i<43;i++) prizes.push("🔟10등");
+// 2등 5개
+for(let i=0;i<5;i++) prizes.push("🥈 2등");
+
+// 3등 10개
+for(let i=0;i<10;i++) prizes.push("🥉 3등");
+
+// 4등 20개
+for(let i=0;i<20;i++) prizes.push("🏅 4등");
+
+// 5등 30개
+for(let i=0;i<30;i++) prizes.push("🎖️ 5등");
+
+// 나머지 233개
+for(let i=0;i<50;i++) prizes.push("6등");
+for(let i=0;i<60;i++) prizes.push("7등");
+for(let i=0;i<50;i++) prizes.push("8등");
+for(let i=0;i<40;i++) prizes.push("9등");
+for(let i=0;i<33;i++) prizes.push("🔟 10등");
 
 // 섞기
 prizes.sort(()=>Math.random()-0.5);
 
 const board=document.getElementById("board");
 
+// 300장 생성
 for(let i=0;i<300;i++){
 
     const ticket=document.createElement("div");
 
     ticket.className="ticket";
-    ticket.innerHTML="🎫";
+    ticket.textContent=`🎫 ${i+1}`;
 
-    ticket.onclick=()=>draw(ticket,i);
+    ticket.addEventListener("click",()=>draw(ticket,i));
 
     board.appendChild(ticket);
 }
@@ -120,36 +157,24 @@ function draw(ticket,index){
     if(ticket.classList.contains("used")) return;
 
     ticket.classList.add("used");
+    ticket.classList.add("shaking");
 
-    const result=document.getElementById("result");
-    const text=document.getElementById("text");
+    setTimeout(()=>{
 
-    result.style.display="flex";
-    text.classList.add("drum");
+        ticket.classList.remove("shaking");
 
-    let count=0;
+        const result=document.getElementById("result");
+        const text=document.getElementById("text");
 
-    const ani=setInterval(()=>{
+        text.innerHTML=prizes[index];
 
-        count++;
+        result.style.display="flex";
 
-        text.innerHTML="🥁 두구두구 🥁";
+        setTimeout(()=>{
+            result.style.display="none";
+        },2000);
 
-        if(count>=20){
-
-            clearInterval(ani);
-
-            text.classList.remove("drum");
-
-            text.innerHTML=
-            "🎉 "+prizes[index]+" 🎉";
-
-            setTimeout(()=>{
-                result.style.display="none";
-            },2500);
-        }
-
-    },100);
+    },1000);
 }
 </script>
 
