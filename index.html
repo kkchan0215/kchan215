@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>초성 퀴즈</title>
+<title>초대형 초성퀴즈</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 
 <style>
+
 *{
 margin:0;
 padding:0;
@@ -20,54 +21,59 @@ min-height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:linear-gradient(135deg,#fff5f8,#eef8ff);
 padding:20px;
+background:linear-gradient(135deg,#fff4fa,#eef8ff);
 }
 
 .card{
 width:100%;
-max-width:600px;
+max-width:700px;
 background:white;
-border-radius:30px;
 padding:30px;
+border-radius:30px;
 box-shadow:0 15px 40px rgba(0,0,0,.08);
 text-align:center;
 }
 
 h1{
-color:#ff6ba7;
+color:#ff5fa3;
 margin-bottom:15px;
 }
 
 .topic{
-display:inline-block;
-padding:10px 20px;
-background:#ffe2f0;
+background:#ffe3f1;
+padding:12px;
 border-radius:20px;
-font-size:22px;
-color:#ff5c9f;
-margin-bottom:20px;
+font-size:24px;
+color:#ff4e98;
+margin-bottom:15px;
 }
 
 .quiz{
-font-size:50px;
+font-size:54px;
 letter-spacing:10px;
-margin:30px 0;
+margin:25px 0;
 color:#444;
+}
+
+.timer{
+font-size:24px;
+color:#ff6b6b;
+margin-bottom:15px;
 }
 
 input{
 width:100%;
 padding:16px;
-font-size:20px;
 border:none;
 border-radius:15px;
 background:#f4f4f4;
-outline:none;
+font-size:20px;
 text-align:center;
+outline:none;
 }
 
-.btns{
+.buttons{
 display:flex;
 gap:10px;
 margin-top:15px;
@@ -80,186 +86,417 @@ border:none;
 border-radius:15px;
 font-size:18px;
 cursor:pointer;
+transition:.2s;
 }
 
-.check{
-background:#7ecbff;
+button:hover{
+transform:scale(1.03);
+}
+
+.submit{
+background:#7ecfff;
+color:white;
+}
+
+.skip{
+background:#ff9fc9;
 color:white;
 }
 
 .change{
-background:#ff9ac7;
-color:white;
+background:#ffd86c;
 }
 
 .result{
+height:40px;
 margin-top:15px;
 font-size:22px;
-height:30px;
 }
 
-.score{
+.stats{
 margin-top:15px;
-color:#666;
+line-height:1.8;
 font-size:18px;
+color:#666;
 }
 
-.streak{
-margin-top:8px;
-color:#ff5c9f;
-}
 </style>
 </head>
+
 <body>
 
 <div class="card">
 
-<h1>🎀 초성 퀴즈 🎀</h1>
+<h1>🎀 초성퀴즈 🎀</h1>
 
 <div class="topic" id="topic"></div>
 
+<div class="timer" id="timer">20초</div>
+
 <div class="quiz" id="quiz"></div>
 
-<input id="answer" placeholder="정답 입력">
+<input
+id="answer"
+placeholder="정답 입력">
 
-<div class="btns">
-<button class="check" onclick="checkAnswer()">정답</button>
-<button class="change" onclick="changeTopic()">주제 변경</button>
+<div class="buttons">
+<button class="submit" onclick="checkAnswer()">정답</button>
+<button class="skip" onclick="skipQuiz()">스킵</button>
+<button class="change" onclick="changeTopic()">주제변경</button>
 </div>
 
 <div class="result" id="result"></div>
 
-<div class="score" id="score">점수 : 0</div>
-<div class="streak" id="streak">연속 정답 : 0</div>
+<div class="stats">
+<div id="score">점수 : 0</div>
+<div id="best">최고 점수 : 0</div>
+<div id="accuracy">정답률 : 0%</div>
+</div>
 
 </div>
 
 <script>
+  const topics = {
 
-const topics={
+"동물":[
+"강아지","고양이","토끼","호랑이","기린","코끼리","사자","악어","원숭이","하마",
+"치타","판다","곰","늑대","여우","다람쥐","고슴도치","캥거루","코알라","얼룩말"
+],
 
-"동물":["강아지","고양이","토끼","호랑이","기린","코끼리","사자","악어","원숭이","하마","치타","판다","곰","늑대","여우","다람쥐","코알라","캥거루","고슴도치","얼룩말"],
+"과일":[
+"사과","바나나","포도","복숭아","딸기","수박","참외","망고","키위","귤",
+"오렌지","레몬","체리","배","감","멜론","자두","블루베리","파인애플","무화과"
+],
 
-"과일":["사과","바나나","포도","복숭아","딸기","수박","참외","망고","키위","귤","오렌지","체리","레몬","배","감","멜론","자두","블루베리","파인애플","무화과"],
+"음식":[
+"김밥","떡볶이","햄버거","피자","라면","치킨","초밥","비빔밥","불고기","냉면",
+"만두","잡채","돈까스","카레","짜장면","짬뽕","순두부","갈비탕","김치찌개","된장찌개"
+],
 
-"음식":["김밥","떡볶이","햄버거","피자","라면","치킨","초밥","비빔밥","불고기","냉면","만두","잡채","돈까스","카레","김치찌개","된장찌개","순두부","갈비탕","짜장면","오므라이스"],
+"학교":[
+"연필","지우개","책상","칠판","공책","필통","교과서","분필","가위","색연필",
+"볼펜","형광펜","사물함","컴퓨터","노트","수첩","삼각자","지구본","책가방","화이트보드"
+],
 
-"학교":["연필","지우개","책상","칠판","공책","필통","색연필","가위","교과서","분필","볼펜","형광펜","사물함","지구본","컴퓨터","노트","수첩","삼각자","책가방","화이트보드"],
+"나라":[
+"한국","중국","일본","미국","영국","프랑스","독일","태국","베트남","캐나다",
+"호주","브라질","인도","멕시코","스페인","이탈리아","러시아","스위스","이집트","아르헨티나"
+],
 
-"나라":["한국","중국","일본","미국","영국","프랑스","독일","캐나다","태국","베트남","호주","브라질","멕시코","스페인","인도","이탈리아","스위스","러시아","이집트","아르헨티나"],
+"운동":[
+"축구","야구","농구","배구","수영","골프","탁구","양궁","배드민턴","테니스",
+"복싱","태권도","유도","펜싱","체조","컬링","승마","마라톤","레슬링","스케이트"
+],
 
-"운동":["축구","야구","농구","배구","수영","골프","탁구","양궁","테니스","배드민턴","복싱","유도","태권도","펜싱","체조","컬링","승마","마라톤","레슬링","스케이트"],
+"직업":[
+"의사","교사","경찰","소방관","요리사","가수","배우","화가","기자","변호사",
+"과학자","개발자","건축가","간호사","파일럿","군인","농부","작가","사장","운동선수"
+],
 
-"직업":["의사","교사","경찰","소방관","요리사","배우","가수","화가","기자","변호사","과학자","건축가","농부","파일럿","간호사","군인","개발자","사장","작가","운동선수"],
+"탈것":[
+"자동차","비행기","기차","버스","지하철","택시","배","헬리콥터","오토바이","자전거",
+"트럭","전동킥보드","구급차","소방차","경찰차","잠수함","열기구","요트","우주선","트램"
+],
 
-"탈것":["자동차","비행기","기차","버스","지하철","택시","배","헬리콥터","오토바이","자전거","트럭","전동킥보드","열기구","요트","잠수함","구급차","소방차","경찰차","우주선","트램"],
+"산리오":[
+"시나모롤","쿠로미","마이멜로디","포차코","한교동",
+"케로케로케로피","턱시도샘","배드바츠마루","코기뮹","위시미멜"
+],
 
-"산리오":["시나모롤","쿠로미","마이멜로디","포차코","한교동","케로케로케로피","턱시도샘","배드바츠마루"],
+"공룡":[
+"티라노사우루스","트리케라톱스","스테고사우루스","브라키오사우루스","벨로키랍토르",
+"스피노사우루스","안킬로사우루스","프테라노돈","카르노타우루스","파라사우롤로푸스"
+],
 
-"바다생물":["고래","상어","문어","오징어","해파리","불가사리","가오리","고등어","참치","돌고래","해마","조개","새우","게","멍게","전복","해삼","바닷가재","청어","광어"],
+"바다생물":[
+"고래","상어","문어","오징어","해파리","불가사리","돌고래","가오리","참치","고등어",
+"새우","게","조개","전복","해삼","멍게","바닷가재","해마","광어","청어"
+],
 
-"캐릭터":["뽀로로","루피","크롱","도라에몽","짱구","코난","피카츄","라이언","춘식이","어피치","무지","프로도","네오","튜브","제이지"]
+"캐릭터":[
+"뽀로로","크롱","루피","에디","패티",
+"짱구","도라에몽","코난","피카츄","라이언",
+"춘식이","어피치","무지","네오","튜브"
+],
+
+"꽃":[
+"장미","해바라기","튤립","국화","백합",
+"수국","코스모스","벚꽃","개나리","진달래",
+"민들레","무궁화","채송화","난초","동백꽃"
+],
+
+"곤충":[
+"나비","잠자리","사마귀","무당벌레","벌",
+"개미","모기","파리","장수풍뎅이","사슴벌레",
+"풍뎅이","귀뚜라미","메뚜기","나방","매미"
+],
+
+"전자제품":[
+"컴퓨터","노트북","키보드","마우스","모니터",
+"태블릿","스마트폰","이어폰","헤드폰","스피커",
+"프린터","카메라","공유기","전자시계","전자책"
+],
+
+"우주":[
+"태양","수성","금성","지구","화성",
+"목성","토성","천왕성","해왕성","명왕성",
+"혜성","은하수","우주선","인공위성","블랙홀"
+],
+
+"색깔":[
+"빨강","주황","노랑","초록","파랑",
+"남색","보라","분홍","하양","검정",
+"회색","갈색","하늘색","연두색","금색"
+],
+
+"날씨":[
+"맑음","흐림","비","눈","우박",
+"안개","천둥","번개","태풍","폭염",
+"폭설","강풍","이슬비","소나기","장마"
+],
+
+"악기":[
+"피아노","기타","바이올린","첼로","플루트",
+"클라리넷","트럼펫","트롬본","드럼","하프",
+"오카리나","리코더","가야금","해금","장구"
+],
+
+"채소":[
+"배추","상추","양파","감자","고구마",
+"오이","호박","당근","브로콜리","시금치",
+"무","토마토","파프리카","마늘","콩"
+]
+
 };
-
-let currentTopic;
-let currentWord;
-let score=0;
-let streak=0;
-
-const CHO=[
+  const CHO = [
 "ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ",
 "ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ",
 "ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"
 ];
 
+let currentTopic = "";
+let currentWord = "";
+let usedWords = [];
+
+let score = 0;
+let total = 0;
+let correct = 0;
+
+let timer;
+let timeLeft = 20;
+
+let answered = false;
+
+let oneCount = 0;
+
+let bestScore =
+Number(localStorage.getItem("bestScore")) || 0;
+
+document.getElementById("best").innerText =
+"최고 점수 : " + bestScore;
+
 function chosung(word){
-let result="";
 
-for(let ch of word){
+let result = "";
 
-let code=ch.charCodeAt(0)-44032;
+for(const ch of word){
 
-if(code>=0&&code<=11171){
-result+=CHO[Math.floor(code/588)];
+const code = ch.charCodeAt(0) - 44032;
+
+if(code >= 0 && code <= 11171){
+result += CHO[Math.floor(code / 588)];
 }else{
-result+=ch;
+result += ch;
 }
 }
+
 return result;
+}
+
+function updateAccuracy(){
+
+let rate = total === 0
+? 0
+: Math.round((correct / total) * 100);
+
+document.getElementById("accuracy").innerText =
+"정답률 : " + rate + "%";
+}
+
+function updateTimer(){
+
+document.getElementById("timer").innerText =
+"⏰ " + timeLeft + "초";
+}
+
+function startTimer(){
+
+clearInterval(timer);
+
+timeLeft = 20;
+
+updateTimer();
+
+timer = setInterval(()=>{
+
+timeLeft--;
+
+updateTimer();
+
+if(timeLeft <= 0){
+
+clearInterval(timer);
+
+if(!answered){
+
+answered = true;
+
+total++;
+
+updateAccuracy();
+
+document.getElementById("result").innerHTML =
+"⏰ 시간초과! 정답 : " + currentWord;
+
+setTimeout(nextQuiz,1000);
+}
+
+}
+
+},1000);
+
 }
 
 function nextQuiz(){
 
-let arr=topics[currentTopic];
+answered = false;
 
-currentWord=arr[Math.floor(Math.random()*arr.length)];
+document.getElementById("answer").value = "";
 
-document.getElementById("topic").textContent=
-"주제 : "+currentTopic;
+document.getElementById("result").innerHTML = "";
 
-document.getElementById("quiz").textContent=
+const arr = topics[currentTopic];
+
+if(usedWords.length >= arr.length){
+usedWords = [];
+}
+
+let available =
+arr.filter(word => !usedWords.includes(word));
+
+currentWord =
+available[Math.floor(Math.random() * available.length)];
+
+usedWords.push(currentWord);
+
+document.getElementById("quiz").innerText =
 chosung(currentWord);
 
-document.getElementById("answer").value="";
+startTimer();
 }
 
 function randomTopic(){
 
-const keys=Object.keys(topics);
+const keys = Object.keys(topics);
 
-currentTopic=
+currentTopic =
 keys[Math.floor(Math.random()*keys.length)];
+
+usedWords = [];
+
+document.getElementById("topic").innerText =
+"주제 : " + currentTopic;
 
 nextQuiz();
 }
 
 function changeTopic(){
+
 randomTopic();
+}
+
+function skipQuiz(){
+
+document.getElementById("result").innerHTML =
+"⏭️ 스킵";
+
+setTimeout(nextQuiz,500);
 }
 
 function checkAnswer(){
 
-const input=
+if(answered) return;
+
+answered = true;
+
+clearInterval(timer);
+
+const input =
 document.getElementById("answer").value.trim();
 
-if(input===currentWord){
+total++;
+
+if(input === currentWord){
 
 score++;
-streak++;
+correct++;
 
-document.getElementById("result").innerHTML=
+document.getElementById("result").innerHTML =
 "🎉 정답!";
 
-document.getElementById("score").textContent=
-"점수 : "+score;
+if(score > bestScore){
 
-document.getElementById("streak").textContent=
-"연속 정답 : "+streak;
+bestScore = score;
 
-setTimeout(nextQuiz,800);
+localStorage.setItem(
+"bestScore",
+bestScore
+);
+
+document.getElementById("best").innerText =
+"최고 점수 : " + bestScore;
+}
 
 }else{
 
-streak=0;
-
-document.getElementById("result").innerHTML=
-"❌ 정답 : "+currentWord;
-
-document.getElementById("streak").textContent=
-"연속 정답 : 0";
-}
+document.getElementById("result").innerHTML =
+"❌ 정답 : " + currentWord;
 }
 
-document.getElementById("answer")
+document.getElementById("score").innerText =
+"점수 : " + score;
+
+updateAccuracy();
+
+setTimeout(nextQuiz,1000);
+}
+
+document
+.getElementById("answer")
 .addEventListener("keydown",e=>{
-if(e.key==="Enter"){
+
+if(e.key === "Enter"){
+
 checkAnswer();
 }
+
+if(e.key === "1"){
+
+oneCount++;
+
+if(oneCount >= 5){
+
+oneCount = 0;
+
+skipQuiz();
+}
+
+}
+
 });
 
 randomTopic();
 
 </script>
-
 </body>
 </html>
