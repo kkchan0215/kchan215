@@ -3,179 +3,262 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎀 뽑기판 🎀</title>
+<title>초성 퀴즈</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
-
 *{
-    box-sizing:border-box;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Jua',sans-serif;
 }
 
 body{
-    margin:0;
-    font-family:'Jua',sans-serif;
-    background:#fff5e6;
-    text-align:center;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#fff5f8,#eef8ff);
+padding:20px;
+}
+
+.card{
+width:100%;
+max-width:600px;
+background:white;
+border-radius:30px;
+padding:30px;
+box-shadow:0 15px 40px rgba(0,0,0,.08);
+text-align:center;
 }
 
 h1{
-    margin:20px 0;
-    font-size:38px;
+color:#ff6ba7;
+margin-bottom:15px;
 }
 
-p{
-    margin-top:-10px;
-    font-size:18px;
+.topic{
+display:inline-block;
+padding:10px 20px;
+background:#ffe2f0;
+border-radius:20px;
+font-size:22px;
+color:#ff5c9f;
+margin-bottom:20px;
 }
 
-#board{
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-    display:grid;
-    grid-template-columns:repeat(15,1fr);
-    gap:8px;
+.quiz{
+font-size:50px;
+letter-spacing:10px;
+margin:30px 0;
+color:#444;
 }
 
-.ticket{
-    height:45px;
-    background:white;
-    border:2px dashed #ff9acb;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    user-select:none;
-    transition:.2s;
-    font-size:15px;
+input{
+width:100%;
+padding:16px;
+font-size:20px;
+border:none;
+border-radius:15px;
+background:#f4f4f4;
+outline:none;
+text-align:center;
 }
 
-.ticket:hover{
-    transform:scale(1.05);
+.btns{
+display:flex;
+gap:10px;
+margin-top:15px;
 }
 
-.used{
-    opacity:.35;
-    pointer-events:none;
+button{
+flex:1;
+padding:14px;
+border:none;
+border-radius:15px;
+font-size:18px;
+cursor:pointer;
 }
 
-.shaking{
-    animation:shake .08s infinite;
+.check{
+background:#7ecbff;
+color:white;
 }
 
-@keyframes shake{
-    0%{transform:rotate(-3deg);}
-    50%{transform:rotate(3deg);}
-    100%{transform:rotate(-3deg);}
+.change{
+background:#ff9ac7;
+color:white;
 }
 
-#result{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.7);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:999;
+.result{
+margin-top:15px;
+font-size:22px;
+height:30px;
 }
 
-.result-box{
-    background:white;
-    padding:40px;
-    border-radius:25px;
-    min-width:300px;
-    box-shadow:0 0 30px rgba(0,0,0,0.2);
+.score{
+margin-top:15px;
+color:#666;
+font-size:18px;
 }
 
-#text{
-    font-size:55px;
+.streak{
+margin-top:8px;
+color:#ff5c9f;
 }
 </style>
 </head>
 <body>
 
-<h1>🎀🎁 럭키 뽑기판 🎁🎀</h1>
-<p>원하는 종이를 눌러보세요 ✨</p>
+<div class="card">
 
-<div id="board"></div>
+<h1>🎀 초성 퀴즈 🎀</h1>
 
-<div id="result">
-    <div class="result-box">
-        <div id="text"></div>
-    </div>
+<div class="topic" id="topic"></div>
+
+<div class="quiz" id="quiz"></div>
+
+<input id="answer" placeholder="정답 입력">
+
+<div class="btns">
+<button class="check" onclick="checkAnswer()">정답</button>
+<button class="change" onclick="changeTopic()">주제 변경</button>
+</div>
+
+<div class="result" id="result"></div>
+
+<div class="score" id="score">점수 : 0</div>
+<div class="streak" id="streak">연속 정답 : 0</div>
+
 </div>
 
 <script>
 
-// 총 300장
-const prizes=[];
+const topics={
 
-// 1등 2개
-for(let i=0;i<2;i++) prizes.push("🥇 1등");
+"동물":["강아지","고양이","토끼","호랑이","기린","코끼리","사자","악어","원숭이","하마","치타","판다","곰","늑대","여우","다람쥐","코알라","캥거루","고슴도치","얼룩말"],
 
-// 2등 5개
-for(let i=0;i<5;i++) prizes.push("🥈 2등");
+"과일":["사과","바나나","포도","복숭아","딸기","수박","참외","망고","키위","귤","오렌지","체리","레몬","배","감","멜론","자두","블루베리","파인애플","무화과"],
 
-// 3등 10개
-for(let i=0;i<10;i++) prizes.push("🥉 3등");
+"음식":["김밥","떡볶이","햄버거","피자","라면","치킨","초밥","비빔밥","불고기","냉면","만두","잡채","돈까스","카레","김치찌개","된장찌개","순두부","갈비탕","짜장면","오므라이스"],
 
-// 4등 20개
-for(let i=0;i<20;i++) prizes.push("🏅 4등");
+"학교":["연필","지우개","책상","칠판","공책","필통","색연필","가위","교과서","분필","볼펜","형광펜","사물함","지구본","컴퓨터","노트","수첩","삼각자","책가방","화이트보드"],
 
-// 5등 30개
-for(let i=0;i<30;i++) prizes.push("🎖️ 5등");
+"나라":["한국","중국","일본","미국","영국","프랑스","독일","캐나다","태국","베트남","호주","브라질","멕시코","스페인","인도","이탈리아","스위스","러시아","이집트","아르헨티나"],
 
-// 나머지 233개
-for(let i=0;i<50;i++) prizes.push("6등");
-for(let i=0;i<60;i++) prizes.push("7등");
-for(let i=0;i<50;i++) prizes.push("8등");
-for(let i=0;i<40;i++) prizes.push("9등");
-for(let i=0;i<33;i++) prizes.push("🔟 10등");
+"운동":["축구","야구","농구","배구","수영","골프","탁구","양궁","테니스","배드민턴","복싱","유도","태권도","펜싱","체조","컬링","승마","마라톤","레슬링","스케이트"],
 
-// 섞기
-prizes.sort(()=>Math.random()-0.5);
+"직업":["의사","교사","경찰","소방관","요리사","배우","가수","화가","기자","변호사","과학자","건축가","농부","파일럿","간호사","군인","개발자","사장","작가","운동선수"],
 
-const board=document.getElementById("board");
+"탈것":["자동차","비행기","기차","버스","지하철","택시","배","헬리콥터","오토바이","자전거","트럭","전동킥보드","열기구","요트","잠수함","구급차","소방차","경찰차","우주선","트램"],
 
-// 300장 생성
-for(let i=0;i<300;i++){
+"산리오":["시나모롤","쿠로미","마이멜로디","포차코","한교동","케로케로케로피","턱시도샘","배드바츠마루"],
 
-    const ticket=document.createElement("div");
+"바다생물":["고래","상어","문어","오징어","해파리","불가사리","가오리","고등어","참치","돌고래","해마","조개","새우","게","멍게","전복","해삼","바닷가재","청어","광어"],
 
-    ticket.className="ticket";
-    ticket.textContent=`🎫 ${i+1}`;
+"캐릭터":["뽀로로","루피","크롱","도라에몽","짱구","코난","피카츄","라이언","춘식이","어피치","무지","프로도","네오","튜브","제이지"]
+};
 
-    ticket.addEventListener("click",()=>draw(ticket,i));
+let currentTopic;
+let currentWord;
+let score=0;
+let streak=0;
 
-    board.appendChild(ticket);
+const CHO=[
+"ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ",
+"ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ",
+"ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"
+];
+
+function chosung(word){
+let result="";
+
+for(let ch of word){
+
+let code=ch.charCodeAt(0)-44032;
+
+if(code>=0&&code<=11171){
+result+=CHO[Math.floor(code/588)];
+}else{
+result+=ch;
+}
+}
+return result;
 }
 
-function draw(ticket,index){
+function nextQuiz(){
 
-    if(ticket.classList.contains("used")) return;
+let arr=topics[currentTopic];
 
-    ticket.classList.add("used");
-    ticket.classList.add("shaking");
+currentWord=arr[Math.floor(Math.random()*arr.length)];
 
-    setTimeout(()=>{
+document.getElementById("topic").textContent=
+"주제 : "+currentTopic;
 
-        ticket.classList.remove("shaking");
+document.getElementById("quiz").textContent=
+chosung(currentWord);
 
-        const result=document.getElementById("result");
-        const text=document.getElementById("text");
-
-        text.innerHTML=prizes[index];
-
-        result.style.display="flex";
-
-        setTimeout(()=>{
-            result.style.display="none";
-        },2000);
-
-    },1000);
+document.getElementById("answer").value="";
 }
+
+function randomTopic(){
+
+const keys=Object.keys(topics);
+
+currentTopic=
+keys[Math.floor(Math.random()*keys.length)];
+
+nextQuiz();
+}
+
+function changeTopic(){
+randomTopic();
+}
+
+function checkAnswer(){
+
+const input=
+document.getElementById("answer").value.trim();
+
+if(input===currentWord){
+
+score++;
+streak++;
+
+document.getElementById("result").innerHTML=
+"🎉 정답!";
+
+document.getElementById("score").textContent=
+"점수 : "+score;
+
+document.getElementById("streak").textContent=
+"연속 정답 : "+streak;
+
+setTimeout(nextQuiz,800);
+
+}else{
+
+streak=0;
+
+document.getElementById("result").innerHTML=
+"❌ 정답 : "+currentWord;
+
+document.getElementById("streak").textContent=
+"연속 정답 : 0";
+}
+}
+
+document.getElementById("answer")
+.addEventListener("keydown",e=>{
+if(e.key==="Enter"){
+checkAnswer();
+}
+});
+
+randomTopic();
+
 </script>
 
 </body>
