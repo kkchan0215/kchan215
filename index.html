@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>귀여운 택시미터</title>
+<title>🚕 택시미터</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
@@ -15,139 +15,144 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: #f7efe3;
+  background: #f5ecdf;
   font-family: 'Jua', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  color: #222;
+  padding: 15px;
 }
 
 .container {
-  width: min(430px, 100%);
+  width: 100%;
+  max-width: 430px;
 }
 
 .card {
-  background: #fff;
+  background: white;
   border-radius: 30px;
-  padding: 25px;
-  box-shadow: 0 12px 35px rgba(0,0,0,.12);
+  padding: 22px;
+  box-shadow: 0 10px 35px rgba(0,0,0,.12);
 }
 
 .title {
   text-align: center;
   font-size: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
+/* 택시미터 */
 .meter {
   background: #171717;
-  color: #fff;
+  color: white;
   border-radius: 25px;
   padding: 25px;
   text-align: center;
 }
 
-.label {
-  font-size: 18px;
+.meterTitle {
   color: #aaa;
+  font-size: 17px;
 }
 
 .money {
-  font-size: 55px;
-  margin: 8px 0;
-  letter-spacing: 2px;
-}
-
-.won {
-  font-size: 22px;
-  color: #ddd;
+  font-size: 52px;
+  margin: 5px 0;
 }
 
 .status {
-  margin-top: 15px;
-  font-size: 16px;
   color: #aaa;
+  font-size: 16px;
 }
 
+/* 속도계 */
 .speedBox {
-  margin-top: 20px;
-  background: #222;
+  margin-top: 18px;
+  background: #202020;
+  color: white;
   border-radius: 25px;
   padding: 22px;
   text-align: center;
 }
 
 .speedTitle {
-  font-size: 18px;
   color: #aaa;
-  margin-bottom: 5px;
+  font-size: 18px;
 }
 
 .speed {
-  font-size: 72px;
+  font-size: 75px;
   line-height: 1;
-  color: #fff;
+  margin: 8px 0;
 }
 
 .unit {
-  font-size: 22px;
   color: #bbb;
-  margin-top: 8px;
+  font-size: 20px;
 }
 
-.road {
+.bar {
+  width: 100%;
   height: 10px;
   background: #444;
-  border-radius: 10px;
-  margin: 18px 0 5px;
+  border-radius: 20px;
+  margin-top: 18px;
   overflow: hidden;
 }
 
-.roadBar {
-  height: 100%;
+.barFill {
   width: 0%;
-  background: #fff;
-  border-radius: 10px;
-  transition: width .4s linear;
+  height: 100%;
+  background: white;
+  transition: width .3s linear;
 }
 
-.voice {
-  margin-top: 20px;
-  background: #f2f2f2;
+/* 음성 */
+.voiceBox {
+  margin-top: 18px;
+  background: #f1f1f1;
   border-radius: 20px;
-  padding: 16px;
+  padding: 17px;
   text-align: center;
 }
 
-.voiceText {
-  font-size: 17px;
-  min-height: 25px;
+.voiceStatus {
+  min-height: 26px;
+  font-size: 16px;
+  color: #555;
 }
 
 button {
   width: 100%;
-  border: 0;
+  border: none;
   border-radius: 18px;
   padding: 15px;
-  margin-top: 12px;
+  margin-top: 11px;
   font-family: inherit;
-  font-size: 19px;
-  cursor: pointer;
+  font-size: 18px;
   background: #222;
   color: white;
+  cursor: pointer;
 }
 
 button:active {
-  transform: scale(.98);
+  transform: scale(.97);
 }
 
-.small {
+.test {
+  background: #777;
+}
+
+.stop {
+  background: #555;
+}
+
+.note {
   text-align: center;
   color: #888;
-  font-size: 13px;
-  margin-top: 15px;
+  font-size: 12px;
+  margin-top: 14px;
+  line-height: 1.5;
 }
 </style>
 </head>
@@ -155,81 +160,468 @@ button:active {
 <body>
 
 <div class="container">
+
   <div class="card">
 
-    <div class="title">🚕 귀여운 택시미터</div>
+    <div class="title">🚕 택시미터</div>
 
+    <!-- 택시미터 -->
     <div class="meter">
-      <div class="label">현재 요금</div>
-      <div class="money" id="money">0.00</div>
-      <div class="won">원</div>
-      <div class="status" id="taxiStatus">대기 중</div>
+
+      <div class="meterTitle">
+        현재 요금
+      </div>
+
+      <div class="money">
+        <span id="money">0.00</span>원
+      </div>
+
+      <div class="status" id="taxiStatus">
+        대기 중
+      </div>
+
     </div>
 
+
+    <!-- 속도계 -->
     <div class="speedBox">
-      <div class="speedTitle">🚗 가상 속도계</div>
 
-      <div class="speed" id="speed">0</div>
-      <div class="unit">km/h</div>
-
-      <div class="road">
-        <div class="roadBar" id="roadBar"></div>
+      <div class="speedTitle">
+        🚗 가상 속도계
       </div>
+
+      <div class="speed" id="speed">
+        0
+      </div>
+
+      <div class="unit">
+        km/h
+      </div>
+
+      <div class="bar">
+        <div class="barFill" id="barFill"></div>
+      </div>
+
     </div>
 
-    <div class="voice">
-      <div class="voiceText" id="voiceText">
-        🎙️ 음성인식 대기 중
+
+    <!-- 음성인식 -->
+    <div class="voiceBox">
+
+      <div class="voiceStatus" id="voiceStatus">
+        🎙️ 마이크 대기 중
       </div>
 
-      <button onclick="startVoice()">
-        🎙️ 음성인식 시작
+      <button onclick="requestMicrophone()">
+        🎙️ 마이크 권한 허용 & 음성인식 시작
       </button>
+
     </div>
 
-    <button onclick="startTaxi()">
+
+    <!-- 택시미터 버튼 -->
+    <button onclick="startMeter()">
       🚕 택시미터 시작
     </button>
 
-    <button onclick="stopTaxi()">
+    <button onclick="stopMeter()" class="stop">
       ⏹️ 택시미터 정지
     </button>
 
-    <div class="small">
-      ※ 속도계는 재미를 위한 가상 속도계입니다.
+
+    <!-- 테스트 -->
+    <button onclick="testHighway()" class="test">
+      🧪 속도계 테스트
+    </button>
+
+    <button onclick="resetSpeed()" class="stop">
+      🔄 속도 0으로
+    </button>
+
+
+    <div class="note">
+      "이제 고속도로 갑니다"라고 말하면<br>
+      0 → 120km/h → 1분 유지 → 0km/h
     </div>
 
   </div>
+
 </div>
 
 
 <script>
-/* =========================
+
+/* ===================================
    택시미터
-========================= */
+=================================== */
 
 let money = 0;
-let taxiRunning = false;
-let taxiTimer = null;
+let meterTimer = null;
+let meterRunning = false;
 
-function startTaxi() {
-  if (taxiRunning) return;
+function startMeter() {
 
-  taxiRunning = true;
-  document.getElementById("taxiStatus").textContent = "운행 중 🚕";
+  if (meterRunning) return;
 
-  taxiTimer = setInterval(() => {
-    // 1초마다 0.04원 증가
+  meterRunning = true;
+
+  document.getElementById("taxiStatus").textContent =
+    "운행 중 🚕";
+
+  meterTimer = setInterval(function() {
+
     money += 0.04;
 
     document.getElementById("money").textContent =
       money.toFixed(2);
+
   }, 1000);
 }
 
-function stopTaxi() {
-  taxiRunning = false;
 
-  clearInterval(taxiTimer);
+function stopMeter() {
 
-  document.getElement
+  meterRunning = false;
+
+  clearInterval(meterTimer);
+
+  document.getElementById("taxiStatus").textContent =
+    "정지";
+}
+
+
+/* ===================================
+   속도계
+=================================== */
+
+let speed = 0;
+let speedTimer = null;
+let driving = false;
+
+
+function setSpeed(value) {
+
+  speed = Math.max(0, Math.min(120, value));
+
+  document.getElementById("speed").textContent =
+    Math.round(speed);
+
+  document.getElementById("barFill").style.width =
+    (speed / 120 * 100) + "%";
+}
+
+
+/* ===================================
+   마이크 권한
+=================================== */
+
+async function requestMicrophone() {
+
+  const status =
+    document.getElementById("voiceStatus");
+
+  status.textContent =
+    "🎙️ 마이크 권한을 요청하는 중...";
+
+  try {
+
+    /*
+      실제 마이크 권한 요청.
+      처음이면 브라우저가
+      "마이크를 허용할까요?"
+      같은 팝업을 표시함.
+    */
+
+    const stream =
+      await navigator.mediaDevices.getUserMedia({
+        audio: true
+      });
+
+    /*
+      권한 확인만 하고
+      마이크 스트림은 바로 종료.
+    */
+
+    stream.getTracks().forEach(track => {
+      track.stop();
+    });
+
+    status.textContent =
+      "🎙️ 마이크 허용됨 — 듣고 있어요";
+
+    startSpeechRecognition();
+
+  } catch (error) {
+
+    status.textContent =
+      "❌ 마이크 권한이 필요합니다.";
+
+    console.log(error);
+  }
+}
+
+
+/* ===================================
+   음성인식
+=================================== */
+
+let recognition = null;
+
+function startSpeechRecognition() {
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+
+    document.getElementById("voiceStatus").textContent =
+      "⚠️ 이 브라우저는 음성인식을 지원하지 않아요. 아래 속도계 테스트를 사용하세요.";
+
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+
+  recognition.lang = "ko-KR";
+
+  recognition.continuous = true;
+
+  recognition.interimResults = true;
+
+  recognition.onstart = function() {
+
+    document.getElementById("voiceStatus").textContent =
+      "🎙️ 듣고 있어요 — '이제 고속도로 갑니다'";
+
+  };
+
+
+  recognition.onresult = function(event) {
+
+    let text = "";
+
+    for (
+      let i = event.resultIndex;
+      i < event.results.length;
+      i++
+    ) {
+
+      text +=
+        event.results[i][0].transcript;
+    }
+
+    document.getElementById("voiceStatus").textContent =
+      "🗣️ " + text;
+
+
+    /*
+      띄어쓰기 제거 후 비교
+    */
+
+    const cleanText =
+      text.replace(/\s/g, "");
+
+
+    if (
+      cleanText.includes("이제고속도로갑니다") &&
+      !driving
+    ) {
+
+      startHighway();
+
+    }
+
+  };
+
+
+  recognition.onerror = function(event) {
+
+    console.log(
+      "음성인식 오류:",
+      event.error
+    );
+
+    document.getElementById("voiceStatus").textContent =
+      "🎙️ 음성인식을 다시 시작해 주세요.";
+  };
+
+
+  recognition.onend = function() {
+
+    /*
+      운행 중이 아니면 계속 대기
+    */
+
+    if (!driving) {
+
+      setTimeout(function() {
+
+        try {
+          recognition.start();
+        } catch(e) {}
+
+      }, 500);
+
+    }
+
+  };
+
+
+  try {
+
+    recognition.start();
+
+  } catch(e) {
+
+    console.log(e);
+
+  }
+
+}
+
+
+/* ===================================
+   고속도로 시작
+=================================== */
+
+function startHighway() {
+
+  if (driving) return;
+
+  driving = true;
+
+  document.getElementById("voiceStatus").textContent =
+    "🛣️ 고속도로 진입! 가속 중 🚗💨";
+
+
+  clearInterval(speedTimer);
+
+  speed = 0;
+
+
+  /*
+    0 → 120
+    0.5초마다 2km/h 증가
+    약 30초 동안 가속
+  */
+
+  speedTimer = setInterval(function() {
+
+    speed += 2;
+
+    setSpeed(speed);
+
+
+    if (speed >= 120) {
+
+      speed = 120;
+
+      setSpeed(120);
+
+      clearInterval(speedTimer);
+
+      document.getElementById("voiceStatus").textContent =
+        "🛣️ 고속도로 주행 중 · 120 km/h";
+
+
+      /*
+        120km/h 1분 유지
+      */
+
+      setTimeout(function() {
+
+        slowDown();
+
+      }, 60000);
+
+    }
+
+  }, 500);
+
+}
+
+
+/* ===================================
+   감속
+=================================== */
+
+function slowDown() {
+
+  document.getElementById("voiceStatus").textContent =
+    "🚗 감속 중...";
+
+
+  clearInterval(speedTimer);
+
+
+  speedTimer = setInterval(function() {
+
+    speed -= 2;
+
+    setSpeed(speed);
+
+
+    if (speed <= 0) {
+
+      speed = 0;
+
+      setSpeed(0);
+
+      clearInterval(speedTimer);
+
+      driving = false;
+
+      document.getElementById("voiceStatus").textContent =
+        "🎙️ 다시 음성인식 대기 중";
+
+    }
+
+  }, 500);
+
+}
+
+
+/* ===================================
+   속도계 테스트
+=================================== */
+
+function testHighway() {
+
+  if (driving) return;
+
+  startHighway();
+
+}
+
+
+/* ===================================
+   속도 초기화
+=================================== */
+
+function resetSpeed() {
+
+  clearInterval(speedTimer);
+
+  speed = 0;
+
+  driving = false;
+
+  setSpeed(0);
+
+  document.getElementById("voiceStatus").textContent =
+    "🎙️ 마이크 대기 중";
+
+}
+
+
+/* ===================================
+   초기화
+=================================== */
+
+setSpeed(0);
+
+</script>
+
+</body>
+</html>
